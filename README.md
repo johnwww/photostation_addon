@@ -23,4 +23,3 @@ Using the web server on the QNAP a web api has been developed
 - rater.html : simple webapp that enables undisturbed browsing & single-click rating of photos
 - albums.html : simple webapp that enables undisturbed browsing of albums
 - sync-exif2db.sh : script that enables syncing EXIF ratings into the database and vice versa
-
