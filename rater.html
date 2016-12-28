@@ -1,0 +1,470 @@
+<!doctype html>
+<html>
+    <head>
+		<meta http-equiv="cache-control" content="max-age=0" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+		<meta http-equiv="pragma" content="no-cache" />
+		
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+		<link href="icons/rater/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed">
+		<link href="icons/rater/apple-touch-icon-72x72-precomposed.png" rel="apple-touch-icon-precomposed" sizes="72x72">
+		<link href="icons/rater/apple-touch-icon-114x114-precomposed.png" rel="apple-touch-icon-precomposed" sizes="114x114">
+		<link href="icons/rater/apple-touch-icon-144x144-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144">
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+		<link href="materialdesign/css/materialdesignicons.min.css" rel="stylesheet" >
+
+		<!-- fotorama.css & fotorama.js. -->
+		<link href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
+
+		
+		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
+		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js'></script>
+
+		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/lazysizes/1.4.0/lazysizes.min.js'></script>
+		
+		<style>
+		
+/* GENERAL */			
+			html, body {
+				width:100%; 
+				width:100%; 
+				margin:0; 
+				padding:0;
+				font-family: Geneva, "Helvetica Neue", "Lucida Grande", Arial, Verdana, sans-serif;
+				color: white;
+				background-color: black;
+			}
+			
+			a {
+				color:white;
+			}
+			
+			a:visited, a:link {
+				text-decoration: none; 
+			}
+
+			.clear{clear:both;}
+
+/* INDEX */			
+			ul {
+				margin:0; 
+				padding:0;
+			}
+
+			li { 
+				border:1px solid #000; 
+				padding-bottom: 64px; 
+				height: 0;
+				width:64px; 
+				margin:0px; 
+				float:left; 
+				list-style:none;
+				background-size: cover;
+			}
+			
+			/*.photo {
+				height: 64px;
+				width: 64px; 
+				object-fit: cover;
+			}*/
+			
+			.square.year {
+				background-color: gray;
+				color: black;
+				font-size: 150%;
+				display: table;
+				height: 64px;
+				padding-bottom: 0px;
+			}
+			.year > span {
+				display: table-cell; 
+				vertical-align: middle; 
+				text-align: center; 
+			}
+
+			.clk {
+				cursor: pointer;
+			}
+			
+/* HEADER */						
+			.header {
+				color: white;
+				padding: 2px;
+				font-size: smaller;
+				border-bottom: solid gray 1px;
+			}
+
+			.header > .left {
+				display: inline-block;
+				width: 10%;
+			}
+			.header > .title {
+				display: inline-block;
+				width: 80%;
+				text-align: center;
+			}
+			.header > .right {
+				display: inline-block;
+				width: 10%;
+				text-align: right;
+			}
+			
+/* TOOLBAR */
+			.toolbar {
+				/*text-align: right;*/
+				border-bottom: solid gray 1px;
+			}
+
+			.toolbar > .left {
+				display: inline-block;
+				width: 49%;
+			}
+			.toolbar > .right {
+				display: inline-block;
+				width: 49%;
+				text-align: right;
+			}
+			
+			.toolbar > .rating {
+				/*display: inline-block;*/
+				/*width: 10%;*/
+				/*text-align: right;*/
+				color: darkgray;
+				padding: 0px 5px 0px 5px;
+			}
+			
+			.rating > a {
+				color: darkgray;
+			}
+
+/* MODAL DIALOG */			
+			.modalDialog {
+				position: fixed;
+				font-family: Arial, Helvetica, sans-serif;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				background: rgba(0, 0, 0, 0.8);
+				z-index: 99999;
+				opacity:0;
+				-webkit-transition: opacity 400ms ease-in;
+				-moz-transition: opacity 400ms ease-in;
+				transition: opacity 400ms ease-in;
+				pointer-events: none;
+			}
+			.modalDialog:target {
+				opacity:1;
+				pointer-events: auto;
+			}
+			.modalDialog > div {
+				width: 200px;
+				position: relative;
+				margin: 10% auto;
+				padding: 5px 0px 5px 0px;
+				border-radius: 5px;
+				background-color: black;
+			}
+			
+/* POPUP HEADER-BODY-FOOTER */			
+			.popup > .header {
+				padding: 2px;
+				font-size: smaller;
+				border-bottom: solid gray 1px;
+				text-align: center;
+			}
+			
+			.popup > .body {
+				padding: 5px 10px 5px 10px;
+			}
+
+			.popup > .footer {
+				padding: 2px;
+				font-size: smaller;
+				border-top: solid gray 1px;
+				text-align: center;
+			}
+
+/* FILTER POPUP */			
+			#settings_popup > div {
+				color:white;
+				background-color: black;
+				/*padding: 5px;*/
+			}
+			
+			#filter_rating > span {
+				color: darkgray;
+			}
+
+			#filter_rating > .s {
+				color: white; 
+				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
+			}
+			
+			
+/* SELECTED ELEMENTS */	
+			a.s:link { 
+				text-decoration: none; 
+				color: white; 
+				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
+			}
+
+			a.s:visited { 
+				text-decoration: none; 
+				color: white;
+				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
+			}
+			
+			.s {
+				color: white;
+				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
+			}
+
+/* END */	
+		</style>
+		
+		<script>	
+			String.prototype.format = function() {
+				var formatted = this;
+				for( var arg in arguments ) {
+					formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+				}
+				return formatted;
+			};
+
+		</script>
+    </head>
+    <body>
+
+	<div id="header" class="header">
+		<div class="left"><div class="clk" id="back" data-bind="visible:activeView()!=viewEnum.Index">&#10096;&#10096;</div></div><div class="title" data-bind="text:date().length==0?'ClipCrab':date()"></div><div class="right"><i id="add_to_album" class="mdi mdi-folder-upload clk" ></i><span data-bind="text:selectedPhotos().length"></span>  <a href="#settings_popup"><i id="settings_button" class="mdi mdi-filter-outline clk" data-bind="visible: filter_rating() == 0"></i><i id="settings_button" class="mdi mdi-filter clk" data-bind="visible: filter_rating() != 0"></i></a></div></div>
+	<div id="toolbar" class="toolbar" data-bind="visible:activeView()!=viewEnum.Index" >
+		<div class="left">
+			<i id="add_to_selection" data-bind="visible:selectedPhotos.indexOf(activePhoto())==-1" class="mdi mdi-folder-plus clk"></i><i id="remove_from_selection" data-bind="visible:selectedPhotos.indexOf(activePhoto())!=-1" class="mdi mdi-folder-remove clk"></i>
+		</div>
+		<div class="right">
+			<div class="rating">
+				<a href="#" data-value="0" data-bind="css: {  }">x</a>
+				<a href="#" data-value="1" data-bind="css: { s: $root.activePhoto().rating() >= 1 }">&#9733;</a>
+				<a href="#" data-value="2" data-bind="css: { s: $root.activePhoto().rating() >= 2 }">&#9733;</a>
+				<a href="#" data-value="3" data-bind="css: { s: $root.activePhoto().rating() >= 3 }">&#9733;</a>
+				<a href="#" data-value="4" data-bind="css: { s: $root.activePhoto().rating() >= 4 }">&#9733;</a>
+				<a href="#" data-value="5" data-bind="css: { s: $root.activePhoto().rating() >= 5 }">&#9733;</a>
+			</div>	
+		</div>	
+	</div>
+
+	<div id="page_index" data-bind="visible: activeView()==viewEnum.Index">
+		<ul id="photos_indexaa" data-bind="foreach: indexPhotos">
+			<!-- ko if: ($index() === 0 || $parent.indexPhotos()[$index() - 1].datecreated().substring(0,4) !== datecreated().substring(0,4) ) -->   
+				<li class='square year' data-bind="text: datecreated().substring(0,4)"></li>
+			<!-- /ko -->
+			<li class='square photo clk' data-bind="style: {backgroundImage: makeUrl(thumb()) }"></li>
+		</ul>
+	</div>
+	
+	<div id="page_browse" data-bind="if: activeView()==viewEnum.DateBrowser && browsePhotos().length>0 ">
+		<div id="photos_browser" class="fotorama" data-width="100%" data-height="100%" data-nav="thumbs" data-bind="foreach: browsePhotos, update_fotorama: true">
+			<a data-bind="attr:{href: preview, dataThumb: thumb}"></a>
+		</div>
+	</div>
+
+	<div id="page_browse" data-bind="if: activeView()==viewEnum.SelectionBrowser ">
+		<div id="photos_browser" class="fotorama" data-width="100%" data-height="100%" data-nav="thumbs" data-bind="foreach: selectedPhotos, update_fotorama: true">
+			<a data-bind="attr:{href: preview, dataThumb: thumb}"></a>
+		</div>
+	</div>
+	
+	
+	<div class="modalDialog" id="settings_popup" data-bind="css: { active: filterDialog }">
+		<div class="popup" >
+			<div class="header">Filter</div>
+			<div class="body">
+				<span id="filter_rating">
+					Rating: <span data-value="0">x</span><span class="star" data-value="1">&#9733;</span><span class="star" data-value="2">&#9733;</span><span class="star" data-value="3">&#9733;</span><span class="star" data-value="4">&#9733;</span><span class="star" data-value="5">&#9733;</span>
+				</span>
+			</div>
+			<div class="footer"><a href="#">close</a></div>
+		</div>
+	</div>
+		
+	<script>
+
+//////////////// VIEWMODEL ////////////////
+
+		function makeUrl(u) { return "url('{0}')".format(u); }
+		
+		var viewEnum = {
+			Index : 1,
+			DateBrowser : 2,
+			SelectionBrowser : 3
+		};
+		
+		function myViewModel() {
+			var self = this;
+			
+			self.activeView = ko.observable(viewEnum.Index);
+			
+			self.indexPhotos = ko.observableArray([]).extend({ rateLimit: 10 });
+
+/*			self.browser = ko.observable(true);
+			self.browser.subscribe(function(newval){ 
+				if(newval==false)
+				{
+					self.browser(true);
+				}					
+			});*/
+			self.date = ko.observable("");
+			self.browsePhotos = ko.observableArray([]);
+			self.browseIndex = ko.observable(0);
+
+			self.filterDialog = ko.observable(false);
+			self.filter_rating = ko.observable(0);
+			self.selectedPhotos = ko.observableArray([]);
+			
+			self.activePhoto = ko.pureComputed(function(){
+				if(self.browseIndex() < self.browsePhotos().length)
+					return self.browsePhotos()[self.browseIndex()];
+				else
+					return {rating: ko.observable(0) };
+			});
+			
+			// register server loading function for browsing screen as observer for key variables
+			self.reloadDate = ko.computed(function(){
+				loadDate(self.date(), self.filter_rating(), self.browsePhotos);
+			});
+			
+			// register server loading function for index screen as observer for key variables
+			self.reloadIndex = ko.computed(function(){
+				loadIndex(self.filter_rating(), self.indexPhotos);
+			});
+		};
+		
+		var model = new myViewModel();
+
+//////////////// LOAD & UPDATE SERVER DATA ////////////////
+		
+		function loadIndex(rating, photos){
+			var self = this;
+			photos.removeAll();
+			
+			$.getJSON('medialibrary_api.php?cmd=summary&filter_rating='+rating*20) //self.model.filter_rating()*20)
+			.done(function( data ) {
+				console.log("start load");
+				$.each( data, function( i, item ) {
+					photos.push(ko.mapping.fromJS(item));
+			  	});
+				console.log("end load");
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			})
+		};
+		
+		function setRating(pid, rating, fnDone){
+			var url = "medialibrary_api.php?cmd=update&pid={0}&rating={1}".format(pid, rating);
+			console.log(url);
+			$.getJSON(url)
+			.done(function( data ) {
+				fnDone();
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			});
+		}
+		
+
+		function loadDate(date, rating, photos) {
+			console.log('loadDate');
+			photos.removeAll();
+
+			if(date === "")
+				return; 
+			
+			var url = 'medialibrary_api.php?cmd=date&date=' + date + "&rating="+rating; //model.filter_rating();
+			console.log(url);
+			$.getJSON(url)
+			.done(function( data ) {
+				console.log("start load");
+				$.each( data, function( i, item ) {
+					photos().push(ko.mapping.fromJS(item));
+				});
+				photos.valueHasMutated();
+				console.log("end load");
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			})
+		};
+
+		
+//////////////// EVENT HANDLERS ////////////////
+
+		$(window).resize(function(){
+			height = $(window).height()-$('.fotorama__nav-wrap').outerHeight()-$('.toolbar').offset().top-$('.toolbar').outerHeight();
+			$('.fotorama').fotorama({width: '100%', height: height});
+		});
+
+		$(document).on('click', ".photo" , function() {
+			model.date(ko.dataFor(this).datecreated());
+			model.activeView(viewEnum.DateBrowser);
+		});
+
+		$(document).on('click', "#back" , function() {
+			model.date("");
+			model.activeView(viewEnum.Index);
+		});
+
+		$(document).on('click', "#settings_button" , function() {
+			model.filterDialog(true);
+		});
+		
+		$(document).on('click', "#add_to_album" , function() {
+			model.activeView(viewEnum.SelectionBrowser);
+		});
+		
+		$(document).on('click', "#add_to_selection" , function() {
+			model.selectedPhotos.push(model.activePhoto());
+		});
+		
+		$(document).on('click', "#remove_from_selection" , function() {
+			model.selectedPhotos.remove(model.activePhoto());
+		});		
+
+		$(document).on('click', ".rating > a" , function(e) {
+			var photo = model.activePhoto();
+			var newrating = $(e.target).data('value');
+			
+			setRating(photo.pid(), newrating, function(){ photo.rating(newrating); });
+		});
+		
+		$(document).on('fotorama:show', "#photos_browser" , function(e, fotorama) {
+			model.browseIndex(fotorama.activeIndex);
+		});
+		
+		$("#filter_rating").click(function(e){
+			model.filter_rating( $(e.target).data("value") );
+			$("#filter_rating > span.star").removeClass("s");
+			$("#filter_rating > span.star:lt({0})".format( model.filter_rating() )).addClass("s");
+		});
+		
+		ko.bindingHandlers.update_fotorama = {
+			update: function(element) {    
+				console.log("ko.bindingHandlers.update_fotorama");
+				$('.fotorama').fotorama();
+				$(window).trigger('resize');
+			}    
+		};		
+		
+		ko.applyBindings(model);
+		
+	</script>
+    </body>
+</html>
