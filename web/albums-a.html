@@ -1,0 +1,260 @@
+<!doctype html>
+<html>
+    <head>
+		<meta http-equiv="cache-control" content="max-age=0" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+		<meta http-equiv="pragma" content="no-cache" />
+		
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+		<link href="icons/browser/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed">
+		<link href="icons/browser/apple-touch-icon-72x72-precomposed.png" rel="apple-touch-icon-precomposed" sizes="72x72">
+		<link href="icons/browser/apple-touch-icon-114x114-precomposed.png" rel="apple-touch-icon-precomposed" sizes="114x114">
+		<link href="icons/browser/apple-touch-icon-144x144-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144">
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+		<link href="materialdesign/css/materialdesignicons.min.css" rel="stylesheet" >
+
+		<!-- fotorama.css & fotorama.js. -->
+		<link href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
+
+		
+		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
+		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js'></script>
+	
+		<style>
+		
+/* GENERAL */			
+			html, body {
+				width:100%; 
+				width:100%; 
+				margin:0; 
+				padding:0;
+				font-family: Geneva, "Helvetica Neue", "Lucida Grande", Arial, Verdana, sans-serif;
+				color: white;
+				background-color: black;
+			}
+			
+			a {
+				color:white;
+			}
+			
+			a:visited, a:link {
+				text-decoration: none; 
+			}
+
+			.clear{clear:both;}
+
+/* INDEX */			
+			ul {
+				margin:0; 
+				padding:0;
+			}
+
+			li { 
+				border:1px solid #000; 
+				padding-bottom: 128px; 
+				height: 0;
+				width:128px; 
+				margin:0px; 
+				float:left; 
+				list-style:none;
+				background-size: cover;
+				position: relative;
+			}
+						
+			.clk {
+				cursor: pointer;
+			}
+			
+			.photo {
+				background-color: gray;
+				background-repeat:no-repeat;
+				background-position: center center;
+			}
+			
+			.photo > .title {
+				position:absolute;
+				bottom:0;
+				background: rgba(0,0,0,0.5);
+				width: 100%;
+				text-align: center;
+			}
+						
+/* HEADER */						
+			.header {
+				color: white;
+				padding: 2px;
+				font-size: smaller;
+				border-bottom: solid gray 1px;
+			}
+
+			.header > .left {
+				display: inline-block;
+				width: 10%;
+			}
+			.header > .title {
+				display: inline-block;
+				width: 80%;
+				text-align: center;
+			}
+			.header > .right {
+				display: inline-block;
+				width: 10%;
+				text-align: right;
+			}
+
+/* END */	
+		</style>
+		
+		<script>	
+			String.prototype.format = function() {
+				var formatted = this;
+				for( var arg in arguments ) {
+					formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+				}
+				return formatted;
+			};
+
+		</script>
+    </head>
+    <body>
+
+	<div id="header" class="header">
+		<div class="left"><div class="clk" id="back" data-bind="visible:album()!=null">&#10096;&#10096;</div></div><div class="title" data-bind="text:album()===null?'QPhoto - Albums':album().cAlbumTitle()"></div><div class="right"><i id="refresh_button" class="mdi mdi-refresh clk"></i></div></div>
+
+	<div id="page_index" data-bind="visible: album()===null">
+		<ul id="photos_indexaa" data-bind="foreach: indexAlbums">
+			<li class='square photo clk' data-bind="style: {backgroundImage: makeUrl(thumb()) }"><div class="title" data-bind="text: cAlbumTitle"></div></li>
+		</ul>
+	</div>
+	
+	<div id="page_browse" data-bind="if: (album()!=null && browser()) ">
+		<div id="photos_browser" class="fotorama" data-width="100%" data-height="100%" data-nav="thumbs" data-bind="foreach: browseAlbum">
+			<a data-bind="attr:{href: preview, dataThumb: thumb}"></a>
+		</div>
+	</div>
+	
+	
+	<script>
+
+//////////////// VIEWMODEL ////////////////
+
+		function makeUrl(u) { return "url('{0}')".format(u); }
+		
+		function myViewModel() {
+			var self = this;
+			self.indexAlbums = ko.observableArray([]).extend({ rateLimit: 10 });
+			self.reload = ko.observable(true);
+			self.browseAlbum = ko.observableArray([]);
+			self.album = ko.observable(null);
+			self.browseIndex = ko.observable(0);
+			self.browser = ko.observable(true);
+			
+			self.activePhoto = ko.pureComputed(function(){
+				if(self.browseIndex() < self.browsePhotos().length)
+					return self.browsePhotos()[self.browseIndex()];
+				else
+					return {rating: ko.observable(0) };
+			});
+			
+			// register server loading function for browsing screen as observer for key variables
+			ko.computed(function(){
+				loadAlbum(self.album(), self.browseAlbum);
+			});
+			
+			// register server loading function for index screen as observer for key variables
+			ko.computed(function(){
+				loadIndex(self.reload, self.indexAlbums);
+			});
+		};
+		
+		var model = new myViewModel();
+
+//////////////// LOAD & UPDATE SERVER DATA ////////////////
+		
+		function loadIndex(reload, photos){
+			var self = this;
+			if(!reload())
+				return;
+				
+			photos.removeAll();
+			
+			$.getJSON('medialibrary_api.php?cmd=albums')
+			.done(function( data ) {
+				console.log("start load");
+				$.each( data, function( i, item ) {
+					photos.push(ko.mapping.fromJS(item));
+			  	});
+				console.log("end load");
+				reload(false);
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+				reload(false);
+			})
+		};
+				
+
+		function loadAlbum(album, photos) {
+			photos.removeAll();
+
+			if(album === null)
+				return; 
+			
+			model.browser(false);
+			
+			var url = 'medialibrary_api.php?cmd=album&album=' + album.iPhotoAlbumId();
+			console.log(url);
+			$.getJSON(url)
+			.done(function( data ) {
+				model.browser(true);
+				console.log("start load");
+				$.each( data, function( i, item ) {
+					photos.push(ko.mapping.fromJS(item));
+				});
+				photos.valueHasMutated();
+				$('.fotorama').fotorama();
+				$(window).trigger('resize');
+				console.log("end load");
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			})
+		};
+
+		
+//////////////// EVENT HANDLERS ////////////////
+
+		$(window).resize(function(){
+			height = $(window).height()-$('.fotorama__nav-wrap').outerHeight()-$('.header').outerHeight();
+			$('.fotorama').fotorama({width: '100%', height: height});
+		});
+
+		$(document).on('click', ".photo" , function() {
+			model.album(ko.dataFor(this)); //.iPhotoAlbumId()
+		});
+
+		$(document).on('click', "#back" , function() {
+			model.album(null);
+		});
+
+		$(document).on('click', "#refresh_button" , function() {
+			model.reload(true);
+			model.album.valueHasMutated();
+		});
+
+		$(document).on('fotorama:show', "#photos_browser" , function(e, fotorama) {
+			model.browseIndex(fotorama.activeIndex);
+		});
+		
+		ko.applyBindings(model);
+		
+	</script>
+    </body>
+</html>

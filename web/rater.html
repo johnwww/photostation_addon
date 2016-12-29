@@ -16,219 +16,22 @@
 		<link href="icons/rater/apple-touch-icon-114x114-precomposed.png" rel="apple-touch-icon-precomposed" sizes="114x114">
 		<link href="icons/rater/apple-touch-icon-144x144-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144">
 
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+		<!-- materialdesignicons.css & main.css -->
 		<link href="materialdesign/css/materialdesignicons.min.css" rel="stylesheet" >
+		<link href="css/main.css" rel="stylesheet">
+
+		<!-- jquery.js -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
 
 		<!-- fotorama.css & fotorama.js. -->
 		<link href="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
 		<script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
 
-		
+		<!-- knockout.css & knockout.js. -->
 		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js'></script>
 		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js'></script>
 
-		<script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/lazysizes/1.4.0/lazysizes.min.js'></script>
-		
-		<style>
-		
-/* GENERAL */			
-			html, body {
-				width:100%; 
-				width:100%; 
-				margin:0; 
-				padding:0;
-				font-family: Geneva, "Helvetica Neue", "Lucida Grande", Arial, Verdana, sans-serif;
-				color: white;
-				background-color: black;
-			}
-			
-			a {
-				color:white;
-			}
-			
-			a:visited, a:link {
-				text-decoration: none; 
-			}
-
-			.clear{clear:both;}
-
-/* INDEX */			
-			ul {
-				margin:0; 
-				padding:0;
-			}
-
-			li { 
-				border:1px solid #000; 
-				padding-bottom: 64px; 
-				height: 0;
-				width:64px; 
-				margin:0px; 
-				float:left; 
-				list-style:none;
-				background-size: cover;
-			}
-			
-			/*.photo {
-				height: 64px;
-				width: 64px; 
-				object-fit: cover;
-			}*/
-			
-			.square.year {
-				background-color: gray;
-				color: black;
-				font-size: 150%;
-				display: table;
-				height: 64px;
-				padding-bottom: 0px;
-			}
-			.year > span {
-				display: table-cell; 
-				vertical-align: middle; 
-				text-align: center; 
-			}
-
-			.clk {
-				cursor: pointer;
-			}
-			
-/* HEADER */						
-			.header {
-				color: white;
-				padding: 2px;
-				font-size: smaller;
-				border-bottom: solid gray 1px;
-			}
-
-			.header > .left {
-				display: inline-block;
-				width: 10%;
-			}
-			.header > .title {
-				display: inline-block;
-				width: 80%;
-				text-align: center;
-			}
-			.header > .right {
-				display: inline-block;
-				width: 10%;
-				text-align: right;
-			}
-			
-/* TOOLBAR */
-			.toolbar {
-				/*text-align: right;*/
-				border-bottom: solid gray 1px;
-			}
-
-			.toolbar > .left {
-				display: inline-block;
-				width: 49%;
-			}
-			.toolbar > .right {
-				display: inline-block;
-				width: 49%;
-				text-align: right;
-			}
-			
-			.toolbar > .rating {
-				/*display: inline-block;*/
-				/*width: 10%;*/
-				/*text-align: right;*/
-				color: darkgray;
-				padding: 0px 5px 0px 5px;
-			}
-			
-			.rating > a {
-				color: darkgray;
-			}
-
-/* MODAL DIALOG */			
-			.modalDialog {
-				position: fixed;
-				font-family: Arial, Helvetica, sans-serif;
-				top: 0;
-				right: 0;
-				bottom: 0;
-				left: 0;
-				background: rgba(0, 0, 0, 0.8);
-				z-index: 99999;
-				opacity:0;
-				-webkit-transition: opacity 400ms ease-in;
-				-moz-transition: opacity 400ms ease-in;
-				transition: opacity 400ms ease-in;
-				pointer-events: none;
-			}
-			.modalDialog:target {
-				opacity:1;
-				pointer-events: auto;
-			}
-			.modalDialog > div {
-				width: 200px;
-				position: relative;
-				margin: 10% auto;
-				padding: 5px 0px 5px 0px;
-				border-radius: 5px;
-				background-color: black;
-			}
-			
-/* POPUP HEADER-BODY-FOOTER */			
-			.popup > .header {
-				padding: 2px;
-				font-size: smaller;
-				border-bottom: solid gray 1px;
-				text-align: center;
-			}
-			
-			.popup > .body {
-				padding: 5px 10px 5px 10px;
-			}
-
-			.popup > .footer {
-				padding: 2px;
-				font-size: smaller;
-				border-top: solid gray 1px;
-				text-align: center;
-			}
-
-/* FILTER POPUP */			
-			#settings_popup > div {
-				color:white;
-				background-color: black;
-				/*padding: 5px;*/
-			}
-			
-			#filter_rating > span {
-				color: darkgray;
-			}
-
-			#filter_rating > .s {
-				color: white; 
-				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
-			}
-			
-			
-/* SELECTED ELEMENTS */	
-			a.s:link { 
-				text-decoration: none; 
-				color: white; 
-				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
-			}
-
-			a.s:visited { 
-				text-decoration: none; 
-				color: white;
-				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
-			}
-			
-			.s {
-				color: white;
-				text-shadow: 0 0 5px #fff, 0 0 10px #fff;			
-			}
-
-/* END */	
-		</style>
+		<!--script type='text/javascript' src='http://cdnjs.cloudflare.com/ajax/libs/lazysizes/1.4.0/lazysizes.min.js'></script-->
 		
 		<script>	
 			String.prototype.format = function() {
@@ -238,13 +41,12 @@
 				}
 				return formatted;
 			};
-
 		</script>
     </head>
     <body>
 
 	<div id="header" class="header">
-		<div class="left"><div class="clk" id="back" data-bind="visible:activeView()!=viewEnum.Index">&#10096;&#10096;</div></div><div class="title" data-bind="text:date().length==0?'ClipCrab':date()"></div><div class="right"><i id="add_to_album" class="mdi mdi-folder-upload clk" ></i><span data-bind="text:selectedPhotos().length"></span>  <a href="#settings_popup"><i id="settings_button" class="mdi mdi-filter-outline clk" data-bind="visible: filter_rating() == 0"></i><i id="settings_button" class="mdi mdi-filter clk" data-bind="visible: filter_rating() != 0"></i></a></div></div>
+		<div class="left"><div class="clk" id="back" data-bind="visible:activeView()!=viewEnum.Index">&#10096;&#10096;</div></div><div class="title" data-bind="text:date().length==0?'PhotoRater':date()"></div><div class="right"><i id="add_to_album" class="mdi mdi-folder-upload clk" ></i><span data-bind="text:selectedPhotos().length"></span>  <a href="#settings_popup"><i id="settings_button" class="mdi mdi-filter-outline clk" data-bind="visible: filter_rating() == 0"></i><i id="settings_button" class="mdi mdi-filter clk" data-bind="visible: filter_rating() != 0"></i></a></div></div>
 	<div id="toolbar" class="toolbar" data-bind="visible:activeView()!=viewEnum.Index" >
 		<div class="left">
 			<i id="add_to_selection" data-bind="visible:selectedPhotos.indexOf(activePhoto())==-1" class="mdi mdi-folder-plus clk"></i><i id="remove_from_selection" data-bind="visible:selectedPhotos.indexOf(activePhoto())!=-1" class="mdi mdi-folder-remove clk"></i>
@@ -299,7 +101,7 @@
 
 //////////////// VIEWMODEL ////////////////
 
-		function makeUrl(u) { return "url('{0}')".format(u); }
+		function makeUrl(u) { return "url('../{0}')".format(u); }
 		
 		var viewEnum = {
 			Index : 1,
