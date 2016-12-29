@@ -19,7 +19,7 @@
 
     .clear{clear:both;}
 
-    /* INDEX */			
+/* INDEX */			
     ul {
         margin:0; 
         padding:0;
@@ -36,11 +36,32 @@
         background-size: cover;
     }
 
-    /*.photo {
-        height: 64px;
-        width: 64px; 
-        object-fit: cover;
-    }*/
+    li.album { 
+        border:1px solid #000; 
+        padding-bottom: 128px; 
+        height: 0;
+        width:128px; 
+        margin:0px; 
+        float:left; 
+        list-style:none;
+        background-size: cover;
+        position: relative;
+    }
+
+
+    .photo {
+        background-color: gray;
+        background-repeat:no-repeat;
+        background-position: center center;
+    }
+
+    .photo > .title {
+        position:absolute;
+        bottom:0;
+        background: rgba(0,0,0,0.5);
+        width: 100%;
+        text-align: center;
+    }
 
     .square.year {
         background-color: gray;
