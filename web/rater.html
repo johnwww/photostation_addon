@@ -47,11 +47,9 @@
     <body>
 
 	<div id="header" class="header">
-		<div class="left"><div class="clk" id="back" data-bind="visible:activeView()!=viewEnum.Index">&#10096;&#10096;</div></div><div class="title" data-bind="text:date().length==0?'PhotoRater':date()"></div><div class="right"><i id="add_to_album" class="mdi mdi-folder-upload clk" ></i><span data-bind="text:selectedPhotos().length"></span>  <a href="#settings_popup"><i id="settings_button" class="mdi mdi-filter-outline clk" data-bind="visible: filter_rating() == 0"></i><i id="settings_button" class="mdi mdi-filter clk" data-bind="visible: filter_rating() != 0"></i></a></div></div>
+		<div class="left"><div class="clk" id="back" data-bind="visible:activeView()!=viewEnum.Index">&#10096;&#10096;</div></div><div class="title" data-bind="text:date().length==0?'QPhoto - Rater':date()"></div><div class="right"><a href="#settings_popup"><i id="settings_button" class="mdi mdi-filter-outline clk" data-bind="visible: filter_rating() == 0"></i><i id="settings_button" class="mdi mdi-filter clk" data-bind="visible: filter_rating() != 0"></i></a></div></div>
 	<div id="toolbar" class="toolbar" data-bind="visible:activeView()!=viewEnum.Index" >
-		<div class="left">
-			<i id="add_to_selection" data-bind="visible:selectedPhotos.indexOf(activePhoto())==-1" class="mdi mdi-folder-plus clk"></i><i id="remove_from_selection" data-bind="visible:selectedPhotos.indexOf(activePhoto())!=-1" class="mdi mdi-folder-remove clk"></i>
-		</div>
+        <div class="left"></div>
 		<div class="right">
 			<div class="rating">
 				<a href="#" data-value="0" data-bind="css: {  }">x</a>
@@ -75,16 +73,9 @@
 	
 	<div id="page_browse" data-bind="if: activeView()==viewEnum.DateBrowser && browsePhotos().length>0 ">
 		<div id="photos_browser" class="fotorama" data-width="100%" data-height="100%" data-nav="thumbs" data-bind="foreach: browsePhotos, update_fotorama: true">
-			<a data-bind="attr:{href: preview, dataThumb: thumb}"></a>
+			<a data-bind="attr:{href: prefixUrl(preview()), dataThumb: prefixUrl(thumb())}"></a>
 		</div>
-	</div>
-
-	<div id="page_browse" data-bind="if: activeView()==viewEnum.SelectionBrowser ">
-		<div id="photos_browser" class="fotorama" data-width="100%" data-height="100%" data-nav="thumbs" data-bind="foreach: selectedPhotos, update_fotorama: true">
-			<a data-bind="attr:{href: preview, dataThumb: thumb}"></a>
-		</div>
-	</div>
-	
+	</div>	
 	
 	<div class="modalDialog" id="settings_popup" data-bind="css: { active: filterDialog }">
 		<div class="popup" >
@@ -107,8 +98,7 @@
 		
 		var viewEnum = {
 			Index : 1,
-			DateBrowser : 2,
-			SelectionBrowser : 3
+			DateBrowser : 2
 		};
 		
 		function myViewModel() {
@@ -131,7 +121,6 @@
 
 			self.filterDialog = ko.observable(false);
 			self.filter_rating = ko.observable(0);
-			self.selectedPhotos = ko.observableArray([]);
 			
 			self.activePhoto = ko.pureComputed(function(){
 				if(self.browseIndex() < self.browsePhotos().length)
@@ -229,18 +218,6 @@
 		$(document).on('click', "#settings_button" , function() {
 			model.filterDialog(true);
 		});
-		
-		$(document).on('click', "#add_to_album" , function() {
-			model.activeView(viewEnum.SelectionBrowser);
-		});
-		
-		$(document).on('click', "#add_to_selection" , function() {
-			model.selectedPhotos.push(model.activePhoto());
-		});
-		
-		$(document).on('click', "#remove_from_selection" , function() {
-			model.selectedPhotos.remove(model.activePhoto());
-		});		
 
 		$(document).on('click', ".rating > a" , function(e) {
 			var photo = model.activePhoto();
