@@ -51,7 +51,8 @@
 	<div id="toolbar" class="toolbar" data-bind="visible:activeView()!=viewEnum.Index" >
         <div class="left"></div>
 		<div class="right">
-			<div class="rating">
+            <div style="display: inline-block"><i id="download" class="mdi mdi-download clk"></i> | </div>
+            <div class="rating" style="display: inline-block">
 				<a href="#" data-value="0" data-bind="css: {  }">x</a>
 				<a href="#" data-value="1" data-bind="css: { s: $root.activePhoto().rating() >= 1 }">&#9733;</a>
 				<a href="#" data-value="2" data-bind="css: { s: $root.activePhoto().rating() >= 2 }">&#9733;</a>
@@ -126,7 +127,7 @@
 				if(self.browseIndex() < self.browsePhotos().length)
 					return self.browsePhotos()[self.browseIndex()];
 				else
-					return {rating: ko.observable(0) };
+					return {rating: ko.observable(0), original:ko.observable(""),thumb:ko.observable("") };
 			});
 			
 			// register server loading function for browsing screen as observer for key variables
@@ -219,7 +220,11 @@
 			model.filterDialog(true);
 		});
 
-		$(document).on('click', ".rating > a" , function(e) {
+		$(document).on('click', "#download" , function() {
+            window.open(prefixUrl(model.activePhoto().original()));
+		});
+
+        $(document).on('click', ".rating > a" , function(e) {
 			var photo = model.activePhoto();
 			var newrating = $(e.target).data('value');
 			
