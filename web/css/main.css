@@ -20,12 +20,12 @@
     .clear{clear:both;}
 
 /* INDEX */			
-    ul {
+    ul.index {
         margin:0; 
         padding:0;
     }
 
-    li { 
+    li.index { 
         border:1px solid #000; 
         padding-bottom: 64px; 
         height: 0;
@@ -91,17 +91,21 @@
 
     .header > .left {
         display: inline-block;
-        width: 10%;
+        width: 25%;
     }
     .header > .title {
         display: inline-block;
-        width: 80%;
+        width: 50%;
         text-align: center;
     }
     .header > .right {
         display: inline-block;
-        width: 10%;
+        width: 25%;
         text-align: right;
+    }
+
+    #selectedAlbumName {
+        font-size: smaller;
     }
 			
 /* TOOLBAR */
@@ -118,6 +122,10 @@
         display: inline-block;
         width: 49%;
         text-align: right;
+    }
+
+    .right > div {
+        display: inline-block;
     }
 
     .toolbar > .rating {
