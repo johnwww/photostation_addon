@@ -189,7 +189,7 @@
 				if(self.browseIndex() < self.browsePhotos().length)
 					return self.browsePhotos()[self.browseIndex()];
 				else
-					return {rating: ko.observable(0), pid: ko.observable(-1) };
+					return {rating: ko.observable(0), pid: ko.observable(-1), original:ko.observable(""),thumb:ko.observable("") };
 			});
             
             self.activePhotoInSelectedAlbum = ko.pureComputed(function(){ 
@@ -358,6 +358,7 @@
 			model.filterDialog(true);
 		});
 
+        //DELETE?
 		$(document).on('click', ".clsAlbumSelection" , function(e) {
 			var album = ko.dataFor(e.currentTarget);
 			model.selectedAlbum(album);
@@ -369,9 +370,11 @@
 		});
 
         
-        
+		$(document).on('click', "#download" , function() {
+            window.open(prefixUrl(model.activePhoto().original()));
+		});
 
-		$(document).on('click', ".rating > a" , function(e) {
+        $(document).on('click', ".rating > a" , function(e) {
 			var photo = model.activePhoto();
 			var newrating = $(e.target).data('value');
 			
