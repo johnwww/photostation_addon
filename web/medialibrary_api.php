@@ -54,7 +54,7 @@ switch ($cmd){
 		$sql = "SELECT cAlbumTitle, iPhotoAlbumId, CONCAT(d.cFullPath,'.@__thumb/default',p.cFilename) AS 'thumb' FROM pictureAlbumTable pa LEFT JOIN pictureTable p ON pa.iAlbumCover=p.iPictureId LEFT JOIN dirTable d ON p.iDirId=d.iDirId WHERE albumType=1";
 		break;
 	case 'albummapping':
-		$sql = "SELECT pa.iMediaId AS 'pid', pa.iPhotoAlbumId FROM pictureAlbumMapping pa";
+		$sql = "SELECT pa.iMediaId AS 'pid', pa.iPhotoAlbumId FROM pictureAlbumMapping pa WHERE type=1";
 		break;
 	case 'album':
 		$id = $_REQUEST['album'];
@@ -71,7 +71,7 @@ switch ($cmd){
 			"p.YearMonthDay as 'datecreated' ".
 			"FROM pictureTable p JOIN dirTable d ON p.iDirId=d.iDirId JOIN pictureAlbumMapping pa ON pa.iMediaId=p.iPictureId LEFT JOIN (SELECT * FROM pictureMyFavorite WHERE UserId=0) f ON f.iPictureId=p.iPictureId WHERE pa.iPhotoAlbumId='".$id."' ".$r." ORDER BY p.dateTime ASC";
 		break;
-	case 'update':
+	case 'updaterating':
 		$id = $_REQUEST['pid'];
 		$rating = $_REQUEST['rating'];
 		if (is_numeric($id) && is_numeric($rating) && $rating>=0 && $rating<=5) {
@@ -80,8 +80,26 @@ switch ($cmd){
 		else
 			die("error: non numeric value provided");
 		break;
+	case 'addalbummapping':
+		$id = $_REQUEST['pid'];
+		$albumid = $_REQUEST['iPhotoAlbumId'];
+		if (is_numeric($id) && is_numeric($albumid)) {
+			$sql = sprintf("INSERT IGNORE INTO pictureAlbumMapping (iMediaId, type, iPhotoAlbumId) VALUES (%d, 1, %d)", $id, $albumid);
+		}
+		else
+			die("error: non numeric value provided");
+		break;
+	case 'removealbummapping':
+		$id = $_REQUEST['pid'];
+		$albumid = $_REQUEST['iPhotoAlbumId'];
+		if (is_numeric($id) && is_numeric($albumid)) {
+			$sql = sprintf("DELETE FROM pictureAlbumMapping WHERE iMediaId=%d AND iPhotoAlbumId=%d", $id, $albumid);
+		}
+		else
+			die("error: non numeric value provided");
+		break;
 	default:
-		die("Please specify which cmd you want (recent, date, summary, update)"); 
+		die("Please specify which cmd you want (recent, date, summary, albums, albummapping, updaterating, updatealbummapping)"); 
 }
 
 // Create connection

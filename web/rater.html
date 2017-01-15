@@ -47,28 +47,30 @@
     <body>
 
 	<div id="header" class="header">
-		<div class="left"><div class="clk" id="back" data-bind="visible:activeView()!=viewEnum.Index">&#10096;&#10096;</div></div><div class="title" data-bind="text:date().length==0?'QPhoto - Rater':date()"></div><div class="right"><a href="#settings_popup"><i id="settings_button" class="mdi mdi-filter-outline clk" data-bind="visible: filter_rating() == 0"></i><i id="settings_button" class="mdi mdi-filter clk" data-bind="visible: filter_rating() != 0"></i></a></div></div>
+        <div class="left"><div class="clk" id="back" data-bind="visible:activeView()!=viewEnum.Index">&#10096;&#10096;</div></div><div class="title" data-bind="text:date().length==0?'PhotoRater':date()"></div><div class="right"><a href="#albums_popup"><i class="mdi mdi-folder-image" data-bind="visible: selectedAlbumName().length >0"></i><div style="display: inline" id="selectedAlbumName" data-bind="text: selectedAlbumName"></div><i class="mdi mdi-folder-outline"  data-bind="visible: selectedAlbumName().length==0"></i></a><a href="#settings_popup"><i id="settings_button" class="mdi mdi-filter-outline clk" data-bind="visible: filter_rating() == 0"></i><i id="settings_button" class="mdi mdi-filter clk" data-bind="visible: filter_rating() != 0"></i></a></div></div>
 	<div id="toolbar" class="toolbar" data-bind="visible:activeView()!=viewEnum.Index" >
-        <div class="left"></div>
+		<div class="left">
+		</div>
 		<div class="right">
-            <div style="display: inline-block"><i id="download" class="mdi mdi-download clk"></i> | </div>
-            <div class="rating" style="display: inline-block">
-				<a href="#" data-value="0" data-bind="css: {  }">x</a>
+			<div class="rating" style="display: inline-block">
+				<a href="#" data-value="0" data-bind="css: {  }">o</a>
 				<a href="#" data-value="1" data-bind="css: { s: $root.activePhoto().rating() >= 1 }">&#9733;</a>
 				<a href="#" data-value="2" data-bind="css: { s: $root.activePhoto().rating() >= 2 }">&#9733;</a>
 				<a href="#" data-value="3" data-bind="css: { s: $root.activePhoto().rating() >= 3 }">&#9733;</a>
 				<a href="#" data-value="4" data-bind="css: { s: $root.activePhoto().rating() >= 4 }">&#9733;</a>
 				<a href="#" data-value="5" data-bind="css: { s: $root.activePhoto().rating() >= 5 }">&#9733;</a>
 			</div>	
+            <div style="display: inline-block" data-bind="visible: selectedAlbumName().length!=0"> | <i class="mdi mdi-folder-plus clk" id="addtoalbum" data-bind="visible:!activePhotoInSelectedAlbum()"></i><i class="mdi mdi-folder-remove clk s" id="removefromalbum" data-bind="visible:activePhotoInSelectedAlbum()"></i></div>
+            <div style="display: inline-block"> | <i id="download" class="mdi mdi-download clk"></i></div>
 		</div>	
 	</div>
 
 	<div id="page_index" data-bind="visible: activeView()==viewEnum.Index">
-		<ul id="photos_indexaa" data-bind="foreach: indexPhotos">
+		<ul id="photos_indexaa" class="index" data-bind="foreach: indexPhotos">
 			<!-- ko if: ($index() === 0 || $parent.indexPhotos()[$index() - 1].datecreated().substring(0,4) !== datecreated().substring(0,4) ) -->   
-				<li class='square year' data-bind="text: datecreated().substring(0,4)"></li>
+				<li class='square year index' data-bind="text: datecreated().substring(0,4)"></li>
 			<!-- /ko -->
-			<li class='square photo clk' data-bind="style: {backgroundImage: makeUrl(thumb()) }"></li>
+			<li class='square photo clk index' data-bind="style: {backgroundImage: makeUrl(thumb()) }"></li>
 		</ul>
 	</div>
 	
@@ -76,7 +78,7 @@
 		<div id="photos_browser" class="fotorama" data-width="100%" data-height="100%" data-nav="thumbs" data-bind="foreach: browsePhotos, update_fotorama: true">
 			<a data-bind="attr:{href: prefixUrl(preview()), dataThumb: prefixUrl(thumb())}"></a>
 		</div>
-	</div>	
+	</div>
 	
 	<div class="modalDialog" id="settings_popup" data-bind="css: { active: filterDialog }">
 		<div class="popup" >
@@ -89,7 +91,19 @@
 			<div class="footer"><a href="#">close</a></div>
 		</div>
 	</div>
-		
+
+	<div class="modalDialog" id="albums_popup">
+		<div class="popup" >
+			<div class="header">Albums</div>
+			<div class="body">
+                <ul data-bind="foreach: albums">
+                    <li class="clsAlbumSelection" data-bind="text: cAlbumTitle"></li>
+                </ul>
+			</div>
+			<div class="footer"><a class="btnClose" href="#">None</a></div>
+		</div>
+	</div>
+
 	<script>
 
 //////////////// VIEWMODEL ////////////////
@@ -101,6 +115,47 @@
 			Index : 1,
 			DateBrowser : 2
 		};
+        
+        ko.observableArray.fn.withIndex = function (keyName, useName) {
+            /// keyName == the name of the property used as the index
+            ///            value.
+            /// useName == when false, a function named findByKey 
+            ///            is added to the observableArray.
+            ///            when true, the function is named based
+            ///            on the name of the index property &
+            ///            capitalized (like id becomes findById)
+            var index = ko.computed(function () {
+                var list = this() || [];    // the internal array
+                var keys = {};              // a place for key/value
+                ko.utils.arrayForEach(list, function (v) {
+                    if (keyName) {          // if there is a key
+                        keys[v[keyName]] = v;    // use it
+                    } else {
+                        keys[v] = v;
+                    }
+                });
+                return keys;
+            }, this);
+
+            var fnName = "";
+            if (useName && keyName) {
+                var cap = keyName.substr(0, 1).toUpperCase();
+                if (keyName.length > 1) {
+                    fnName = cap + keyName.substring(1);
+                } else {
+                    fnName = cap;
+                }
+            } else {
+                fnName = "Key";
+            }
+
+            var fnName = "findBy" + fnName;
+            this[fnName] = function (key) {
+                return index()[key];
+            };
+
+            return this;
+        };        
 		
 		function myViewModel() {
 			var self = this;
@@ -118,17 +173,32 @@
 			});*/
 			self.date = ko.observable("");
 			self.browsePhotos = ko.observableArray([]);
+			self.albums = ko.observableArray([]);
+			self.albumMapping = ko.observableArray([])
+                                        .withIndex('pid', true)
+                                        .withIndex('iPhotoAlbumId',true);
+            self.selectedAlbum = ko.observable({ iPhotoAlbumId: ko.observable(-1), cAlbumTitle: ko.observable("") });
+            self.selectedAlbumName = ko.computed( function(){ if(self.selectedAlbum()!=null) return self.selectedAlbum().cAlbumTitle(); else return ""; });
 			self.browseIndex = ko.observable(0);
 
 			self.filterDialog = ko.observable(false);
 			self.filter_rating = ko.observable(0);
-			
+			self.selectedPhotos = ko.observableArray([]);
+
 			self.activePhoto = ko.pureComputed(function(){
 				if(self.browseIndex() < self.browsePhotos().length)
 					return self.browsePhotos()[self.browseIndex()];
 				else
-					return {rating: ko.observable(0), original:ko.observable(""),thumb:ko.observable("") };
+					return {rating: ko.observable(0), pid: ko.observable(-1), original:ko.observable(""),thumb:ko.observable("") };
 			});
+            
+            self.activePhotoInSelectedAlbum = ko.pureComputed(function(){ 
+                return self.albumMapping().filter(
+                    function(a){ 
+                        return ((a.pid() == self.activePhoto().pid()) && (a.iPhotoAlbumId() == self.selectedAlbum().iPhotoAlbumId())); 
+                    } 
+                ).length > 0; 
+            });
 			
 			// register server loading function for browsing screen as observer for key variables
 			self.reloadDate = ko.computed(function(){
@@ -139,7 +209,17 @@
 			self.reloadIndex = ko.computed(function(){
 				loadIndex(self.filter_rating(), self.indexPhotos);
 			});
-		};
+
+            self.reloadAlbums = ko.computed(function(){
+				loadAlbums(self.albums);
+			});
+
+            self.reloadAlbumMapping = function(){
+                console.log("reloadAlbumMapping");
+                //var a = self.albumMapping(); //set depedancy
+				loadAlbumMapping(self.albumMapping);
+			};
+        }
 		
 		var model = new myViewModel();
 
@@ -161,9 +241,43 @@
 				alert( "server error" );
 			})
 		};
-		
+
+		function loadAlbums(albums){
+			var self = this;
+			albums.removeAll();
+			
+			$.getJSON('medialibrary_api.php?cmd=albums')
+			.done(function( data ) {
+				console.log("start load");
+				$.each( data, function( i, item ) {
+					albums.push(ko.mapping.fromJS(item));
+			  	});
+				console.log("end load");
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			})
+		};
+
+		function loadAlbumMapping(albummapping){
+			var self = this;
+			albummapping.removeAll();
+			
+			$.getJSON('medialibrary_api.php?cmd=albummapping')
+			.done(function( data ) {
+				console.log("start load");
+				$.each( data, function( i, item ) {
+					albummapping.push(ko.mapping.fromJS(item));
+			  	});
+				console.log("end load");
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			})
+		};
+        
 		function setRating(pid, rating, fnDone){
-			var url = "medialibrary_api.php?cmd=update&pid={0}&rating={1}".format(pid, rating);
+			var url = "medialibrary_api.php?cmd=updaterating&pid={0}&rating={1}".format(pid, rating);
 			console.log(url);
 			$.getJSON(url)
 			.done(function( data ) {
@@ -173,7 +287,31 @@
 				alert( "server error" );
 			});
 		}
-		
+
+		function setAlbum(pid, iPhotoAlbumId, fnDone){
+			var url = "medialibrary_api.php?cmd=addalbummapping&pid={0}&iPhotoAlbumId={1}".format(pid, iPhotoAlbumId);
+			console.log(url);
+			$.getJSON(url)
+			.done(function( data ) {
+				fnDone();
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			});
+		}
+
+		function removeAlbum(pid, iPhotoAlbumId, fnDone){
+			var url = "medialibrary_api.php?cmd=removealbummapping&pid={0}&iPhotoAlbumId={1}".format(pid, iPhotoAlbumId);
+			console.log(url);
+			$.getJSON(url)
+			.done(function( data ) {
+				fnDone();
+			})
+			.fail(function( data ) {
+				alert( "server error" );
+			});
+		}
+
 
 		function loadDate(date, rating, photos) {
 			console.log('loadDate');
@@ -220,6 +358,18 @@
 			model.filterDialog(true);
 		});
 
+        //DELETE?
+		$(document).on('click', ".clsAlbumSelection" , function(e) {
+			var album = ko.dataFor(e.currentTarget);
+			model.selectedAlbum(album);
+            location.href="#";
+		});
+
+		$(document).on('click', "#albums_popup .btnClose" , function(e) {
+			model.selectedAlbum(null);
+		});
+
+        
 		$(document).on('click', "#download" , function() {
             window.open(prefixUrl(model.activePhoto().original()));
 		});
@@ -230,7 +380,20 @@
 			
 			setRating(photo.pid(), newrating, function(){ photo.rating(newrating); });
 		});
-		
+
+		$(document).on('click', "#addtoalbum" , function() {
+			var photo = model.activePhoto();
+			var album = model.selectedAlbum();
+            setAlbum(photo.pid(), album.iPhotoAlbumId(), function(){ console.log("add to album done");model.reloadAlbumMapping(); });
+		});
+
+        $(document).on('click', "#removefromalbum" , function() {
+			var photo = model.activePhoto();
+			var album = model.selectedAlbum();
+            removeAlbum(photo.pid(), album.iPhotoAlbumId(), function(){ model.reloadAlbumMapping(); });
+		});
+
+            
 		$(document).on('fotorama:show', "#photos_browser" , function(e, fotorama) {
 			model.browseIndex(fotorama.activeIndex);
 		});
